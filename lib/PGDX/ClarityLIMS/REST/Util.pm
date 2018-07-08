@@ -253,6 +253,35 @@ sub getPreservationBySampleId {
     return $source;
 }
 
+sub getSampleUDFLookup {
+
+    my $self = shift;
+    my ($sample_id) = @_;
+
+    if (! exists $self->{_sample_id_to_udf_lookup}->{$sample_id}){
+        my $content = $self->getContentBySampleName($sample_id);
+
+        my $file = $self->_write_content_to_file($content);
+
+        my $parser = new PGDX::LIMS::File::XML::Parser(infile => $file);
+
+        if (!defined($parser)){
+            $self->{_logger}->logconfess("Could not instantiate PGDX::LIMS::File::XML::Parser");
+        }
+        
+        my $lookup = $parser->getUDFLookup();
+
+        if (!defined($lookup)){
+            $self->{_logger}->logconfess("Could not retrieve UDF lookup from content '$content' for sample_id '$sample_id'");
+        }
+
+        $self->{_sample_id_to_udf_lookup}->{$sample_id} = $lookup;
+    }
+}
+
+
+
+
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

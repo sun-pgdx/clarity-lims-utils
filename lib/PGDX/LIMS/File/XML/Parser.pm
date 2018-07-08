@@ -246,6 +246,19 @@ sub getPreservation {
     return undef;
 }
 
+sub getSampleUDFLookup {
+
+    my $self = shift;
+        
+    if (! exists $self->{_field_to_value_lookup}){
+
+        $self->_parse_file();
+    }
+
+    return $self->{_field_to_value_lookup};
+}
+
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
